@@ -1,0 +1,34 @@
+name: Post Project Deadline Comment
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'Pull Request number to comment on'
+        required: true
+        default: '1'
+        type: string
+
+jobs:
+  post-comment:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      issues: write
+    
+    steps:
+      - name: Post deadline comment to PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = '${{ github.event.inputs.pr_number }}';
+            const comment = '@everyone Please note: The target completion date for the Job Application Copilot project is September 16, 2025. All final features, fixes, and documentation should be completed by this deadline. Thank you!';
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: comment
+            });
+            
+            console.log(`Comment posted to PR #${prNumber}`);
